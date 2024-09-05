@@ -1,4 +1,4 @@
-from yt_dlp import *
+from youtube_dl import *
 from youtubesearchpython import *
 
 
@@ -6,6 +6,9 @@ from youtubesearchpython import *
 ydl_opts =  {
     'format': 'm4a/bestaudio',
 }
+
+dl = YoutubeDL(ydl_opts)
+suggestions = Suggestions(language = "en", region = "IN", timeout = None)
 
 
 
@@ -16,6 +19,7 @@ def getUrlsInfo(query,limit=20,lang="en",region="IN",timeout=None):
     urlInfo = [
         {
             "title" : result["title"],
+            "publishedTime":result["publishedTime"],
             "publishedTime":result["publishedTime"],
             "thumbnail":result["thumbnails"][0]["url"],
             "channelName":result["channel"]["name"],
@@ -30,7 +34,10 @@ def getUrlsInfo(query,limit=20,lang="en",region="IN",timeout=None):
 
 
 def getStream(url):
-    dl = YoutubeDL(ydl_opts)
     info = dl.extract_info(url,download=False)
-    dl.close()
     return info["url"]
+
+
+def getSuggestions(query):
+    results = suggestions.get(query)["result"]
+    return results

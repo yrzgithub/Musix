@@ -7,6 +7,9 @@ ydl_opts =  {
     'format': 'm4a/bestaudio',
 }
 
+dl = YoutubeDL(ydl_opts)
+suggestions = Suggestions(language = "en", region = "IN", timeout = None)
+
 
 
 def getUrlsInfo(query,limit=20,lang="en",region="IN",timeout=None):
@@ -31,6 +34,10 @@ def getUrlsInfo(query,limit=20,lang="en",region="IN",timeout=None):
 
 
 def getStream(url):
-    dl = YoutubeDL(ydl_opts)
     info = dl.extract_info(url,download=False)
     return info["url"]
+
+
+def getSuggestions(query):
+    results = suggestions.get(query)["result"]
+    return results
