@@ -1,17 +1,25 @@
 package com.android.musix
 
 import android.app.Activity
+import android.content.DialogInterface
+import android.content.DialogInterface.OnClickListener
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.ListView
+import android.widget.PopupWindow
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.core.widget.addTextChangedListener
@@ -36,6 +44,7 @@ class Search : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_search, container, false)
 
+        val layout = view.findViewById<LinearLayout>(R.id.layout)
         val search = view.findViewById<SearchView>(R.id.search)
         val listView = view.findViewById<ListView>(R.id.searchList)
 
