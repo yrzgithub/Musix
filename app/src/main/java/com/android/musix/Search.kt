@@ -1,5 +1,6 @@
 package com.android.musix
 
+import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,6 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
+import android.widget.ListView
+import android.widget.TextView
+import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.core.widget.addTextChangedListener
 import com.chaquo.python.Python
 import kotlinx.coroutines.CoroutineScope
@@ -31,10 +36,22 @@ class Search : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_search, container, false)
 
-        val adapter = SearchAdapter()
+        val search = view.findViewById<SearchView>(R.id.search)
+        val listView = view.findViewById<ListView>(R.id.searchList)
 
-        val autoComplete = view.findViewById<AutoCompleteTextView>(R.id.search)
-        autoComplete.setAdapter(adapter)
+        val adapter = SearchAdapter(activity as Activity)
+        listView.adapter = adapter
+
+        search.setOnQueryTextListener(object : OnQueryTextListener {
+            override fun onQueryTextChange(p0: String?): Boolean {
+                adapter.getSuggestions(p0!!)
+                return true
+            }
+
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                TODO("Not yet implemented")
+            }
+        })
 
         return view
     }

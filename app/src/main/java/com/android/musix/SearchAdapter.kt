@@ -1,17 +1,21 @@
 package com.android.musix
 
+import android.app.Activity
+import android.content.Context
+import android.database.DataSetObserver
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.Filter
 import android.widget.Filterable
+import android.widget.TextView
 import com.chaquo.python.Python
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SearchAdapter() : BaseAdapter(),Filterable {
+class SearchAdapter(var activity : Activity) : BaseAdapter() {
 
     var results : List<String> = listOf()
     var main = Python.getInstance().getModule("main")
@@ -28,48 +32,30 @@ class SearchAdapter() : BaseAdapter(),Filterable {
         return 0
     }
 
-    override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
-        TODO("Not yet implemented")
-    }
+    override fun getView(p0: Int, view: View?, p2: ViewGroup?): View {
 
-    override fun getFilter(): Filter {
-        return object : Filter() {
-            override fun performFiltering(p0: CharSequence?): FilterResults {
-                val results = FilterResults()
-
-                val query : String = p0.toString()
-              //  println(query)
-                getSuggestions(query)
-
-                results.apply {
-                    count = this@SearchAdapter.count
-                    values = this@SearchAdapter.results.filter { check -> check.contains(p0.toString()) }
-                }
-
-                return results
-            }
-
-            override fun publishResults(p0: CharSequence?, filterResults: FilterResults?) {
-                if(filterResults!=null)
-                {
-                    this@SearchAdapter.results = filterResults.values as List<String>
-                    notifyDataSetChanged()
-                }
-            }
-
-        }
+        val viewNew : View = if(view==null) activity.layoutInflater.inflate(R.layout.search_result,p2,false) else view
+        val textResult : TextView = viewNew.findViewById(R.id.searchResult)
+        textResult.text = results[p0]
+        return viewNew
 
     }
 
     fun update(results: List<String>) {
-        this.results = results
-        notifyDataSetChanged()
+        activity.runOnUiThread {
+            this.results = results
+            notifyDataSetChanged()
+        }
+    }
+
+    override fun registerDataSetObserver(observer: DataSetObserver?) {
+        super.registerDataSetObserver(observer)
     }
 
     fun getSuggestions(query : String)
     {
         CoroutineScope(Dispatchers.IO).launch {
-            val results : List<String> = main.callAttr("getSuggestions",query).map { it.toString() }
+            val results : List<String> = main.callAttr("getSuggestions",query).asList().map { it.toString() }
             println(results)
             update(results)
         }
