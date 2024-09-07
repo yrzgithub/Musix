@@ -59,46 +59,50 @@
 
     </androidx.viewpager2.widget.ViewPager2>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/controls"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.488"
-        tools:layout_editor_absoluteX="199dp">
+   <LinearLayout
+       android:id="@+id/controls"
+       android:layout_width="match_parent"
+       android:layout_marginEnd="5dp"
+       android:layout_height="50dp"
+       android:gravity="start"
+       android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/imageButton7"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/search"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageButton8" />
+       <ImageView
+           android:layout_width="0dp"
+           android:layout_height="wrap_content"
+           android:layout_gravity="start"
+           android:layout_weight="1"
+           android:src="@drawable/img" />
 
-        <ImageButton
-            android:id="@+id/imageButton8"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/search"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="match_parent"
+           android:gravity="center"
+           android:layout_weight="1"
+           android:textSize="18sp"
+           android:marqueeRepeatLimit="marquee_forever"
+           android:text="Song Title"/>
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/search"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton8"
-            app:layout_constraintStart_toStartOf="parent" />
+       <ImageButton
+           android:layout_width="0dp"
+           android:layout_height="match_parent"
+           android:layout_marginEnd="5dp"
+           android:backgroundTint="@android:color/transparent"
+           android:adjustViewBounds="true"
+           android:scaleType="centerCrop"
+           android:layout_weight=".5"
+           android:src="@drawable/favourite"/>
 
-        <SeekBar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/imageButton8"
-            app:layout_constraintBottom_toBottomOf="parent" />
+       <ImageButton
+           android:layout_width="0dp"
+           android:layout_height="match_parent"
+           android:backgroundTint="@android:color/transparent"
+           android:adjustViewBounds="true"
+           android:scaleType="centerCrop"
+           android:layout_weight=".5"
+           android:src="@drawable/pause_small"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+   </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout
         android:layout_width="match_parent"
