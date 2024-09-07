@@ -3,8 +3,11 @@ package com.android.musix
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.get
@@ -26,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         val tab : TabLayout = findViewById<TabLayout>(R.id.tabLayout)
         val pager = findViewById<ViewPager2>(R.id.viewPager)
+        val controls = findViewById<ConstraintLayout>(R.id.controls)
 
         tab.addTab(tab.newTab().setIcon(R.drawable.search))
         tab.addTab(tab.newTab().setIcon(R.drawable.favourite))
@@ -52,6 +56,10 @@ class MainActivity : AppCompatActivity() {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
             }
         })
+
+        controls.setOnClickListener {
+            Toast.makeText(this@MainActivity,"Clicked",LENGTH_LONG).show()
+        }
 
     }
 }
