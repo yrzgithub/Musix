@@ -16,53 +16,39 @@ class YTInfo(val query : String) {
     var thumbnail : String? = null
     var channelName : String? = null
     var channelThumbnail : String? = null
+    var views : String? = null
     var link : String? = null
     var stream_url : String? = null
 
-    var infoList : MutableList<YTInfo>? = null
+    var infoList : List<YTInfo>? = null
 
-    constructor(query : String,title:String,publishedTime:String,thumbnail:String,channelName:String,channelThumbnail:String,link:String,stream_url:String) : this(query)
+    fun fetch() : List<YTInfo>?
     {
-        this.title = title
-        this.publishedTime = publishedTime
-        this.thumbnail = thumbnail
-        this.channelName = channelName
-        this.channelThumbnail = channelThumbnail
-        this.link = link
-        this.stream_url = stream_url
-    }
+         infoList = module.callAttr("getUrlsInfo",query).asList().map {
 
-    suspend fun fetch()
-    {
-        withContext(Dispatchers.IO) {
-            infoList = mutableListOf<YTInfo>()
-
-            module.callAttr("getUrlsInfo",query).asList().forEach {
-
-                    val result = it.asMap().entries.associate {
-                        (key,value) -> if(key!=null && value!=null) key.toString() to value.toString() else key.toString() to null
-                    }
-
-                    val info = YTInfo(query)
-
-                    info.apply {
-                        title = result["title"]
-                        publishedTime = result["publishedTime"]
-                        thumbnail = result["thumbnail"]
-                        channelName = result["channelName"]
-                        channelThumbnail = result["channelThumnail"]
-                        link = result["link"]
-                    }
-
-                    infoList!!.add(info)
-                }
+            val result = it.asMap().entries.associate {
+                    (key,value) -> if(key!=null && value!=null) key.toString() to value.toString() else key.toString() to null
             }
+
+            val info = YTInfo(query)
+
+            info.apply {
+                title = result["title"]
+                publishedTime = result["publishedTime"]
+                thumbnail = result["thumbnail"]
+                channelName = result["channelName"]
+                views = result["views"]
+                channelThumbnail = result["channelThumnail"]
+                link = result["link"]
+            }
+        }
+
+        return infoList
     }
 
-    suspend fun getStream() : String? {
-        stream_url = module.callAttr("getStream", infoList?.get(0)?.link).toString()
-        Log.e("YTInfo", stream_url!!)
+    fun getStream(info : YTInfo) : String? {
+        println("link : "+ info.link)
+        stream_url = module.callAttr("getStream", info.link).toString()
         return stream_url
-
     }
 }

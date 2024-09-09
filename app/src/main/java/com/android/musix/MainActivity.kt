@@ -10,6 +10,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.animation.AnimationUtils
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.Toast
@@ -21,6 +22,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.get
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -35,6 +38,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+//        var model = ViewModelProvider(this)[Player::class.java]
 
         val main = findViewById<LinearLayout>(R.id.main)
         val tab : TabLayout = findViewById<TabLayout>(R.id.tabLayout)
@@ -69,30 +74,6 @@ class MainActivity : AppCompatActivity() {
 
         controls.setOnClickListener {
 
-            println("Clicked")
-
-            val layout = layoutInflater.inflate(R.layout.player_pop,null)
-
-            val dropDown = layout.findViewById<ImageButton>(R.id.drop_down)
-
-            val pop = PopupWindow(this@MainActivity)
-
-            pop.setOnDismissListener {
-//                pop.animationStyle = R.style.PopDownAnimation
-            }
-
-            dropDown.setOnClickListener {
-//                pop.dismiss()
-//                pop.animationStyle=R.style.PopupAnimation
-            }
-
-//            pop.apply {
-//                width = MATCH_PARENT
-//                height = WRAP_CONTENT
-//                contentView = layout
-//                animationStyle=R.style.PopupAnimation
-//                showAtLocation(layout,Gravity.BOTTOM,0,0)
-//            }
         }
 
     }

@@ -1,4 +1,4 @@
-from youtube_dl import *
+from yt_dlp import *
 from youtubesearchpython import *
 
 
@@ -20,7 +20,7 @@ def getUrlsInfo(query,limit=20,lang="en",region="IN",timeout=None):
         {
             "title" : result["title"],
             "publishedTime":result["publishedTime"],
-            "publishedTime":result["publishedTime"],
+            "views":result["viewCount"]["short"],
             "thumbnail":result["thumbnails"][0]["url"],
             "channelName":result["channel"]["name"],
             "channelThumnail": result["channel"]["thumbnails"][0]["url"],
@@ -29,6 +29,8 @@ def getUrlsInfo(query,limit=20,lang="en",region="IN",timeout=None):
 
         for result in results
     ]
+
+    print(urlInfo[0]["link"])
 
     return urlInfo
 

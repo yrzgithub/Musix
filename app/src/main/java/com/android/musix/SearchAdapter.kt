@@ -14,6 +14,7 @@ import com.chaquo.python.Python
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
 
 class SearchAdapter(var activity : Activity) : BaseAdapter() {
 
@@ -25,11 +26,11 @@ class SearchAdapter(var activity : Activity) : BaseAdapter() {
     }
 
     override fun getItem(p0: Int): Any {
-        return p0
+        return results[p0]
     }
 
     override fun getItemId(p0: Int): Long {
-        return 0
+        return p0.toLong()
     }
 
     override fun getView(p0: Int, view: View?, p2: ViewGroup?): View {
@@ -48,15 +49,10 @@ class SearchAdapter(var activity : Activity) : BaseAdapter() {
         }
     }
 
-    override fun registerDataSetObserver(observer: DataSetObserver?) {
-        super.registerDataSetObserver(observer)
-    }
-
     fun getSuggestions(query : String)
     {
         CoroutineScope(Dispatchers.IO).launch {
             val results : List<String> = main.callAttr("getSuggestions",query).asList().map { it.toString() }
-            println(results)
             update(results)
         }
     }
