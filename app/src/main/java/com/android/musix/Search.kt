@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.view.animation.AnimationUtils
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.ImageButton
@@ -24,11 +25,16 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.SearchView.GONE
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.appcompat.widget.SearchView.OnSuggestionListener
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import com.bumptech.glide.Glide
 import com.chaquo.python.Python
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -50,9 +56,13 @@ class Search : Fragment() {
         val search = view.findViewById<SearchView>(R.id.search)
         val listView = view.findViewById<ListView>(R.id.searchList)
 
+        val controls = activity?.findViewById<LinearLayout>(R.id.controls)
+
         val thumbnail = activity?.findViewById<ImageView>(R.id.thumbnail)
         val title = activity?.findViewById<TextView>(R.id.title)
         val favourite =activity?.findViewById<ImageButton>(R.id.favourite)
+
+       // val player = activity?.findViewById<LinearLayout>(R.id.player)
 
         title!!.isEnabled = true
 
@@ -63,11 +73,18 @@ class Search : Fragment() {
             search.setQuery(adapter.getItem(i).toString(),false)
         }
 
+        val bottom = BottomSheet()
+
+        controls?.setOnClickListener {
+            bottom.show(requireActivity().supportFragmentManager,"Cute")
+        }
+
         search.setOnClickListener {
             listView.adapter = adapter
         }
 
         search.setOnQueryTextListener(object : OnQueryTextListener {
+
             override fun onQueryTextChange(p0: String?): Boolean {
                 adapter.getSuggestions(p0!!)
                 return false
@@ -95,8 +112,8 @@ class Search : Fragment() {
 
                                 val info = infos.get(i)
 
-                           //     Glide.with(requireContext()).load(info.thumbnail).into(thumbnail!!)
-                            //    title!!.setText(info.title)
+                                Glide.with(requireContext()).load(info.thumbnail).into(thumbnail!!)
+                                title!!.setText(info.title)
 
                                 val play = Player(requireActivity().application,requireContext())
 
