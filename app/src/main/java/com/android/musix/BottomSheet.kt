@@ -16,12 +16,12 @@ class BottomSheet() : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        val view = inflater.inflate(R.layout.player_pop,container,false)
+        val view = activity?.layoutInflater?.inflate(R.layout.player_pop,container,false)
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        BottomSheetBehavior.from(view).state=BottomSheetBehavior.STATE_EXPANDED
+    //    BottomSheetBehavior.from(view).state=BottomSheetBehavior.STATE_EXPANDED
         super.onViewCreated(view, savedInstanceState)
     }
 

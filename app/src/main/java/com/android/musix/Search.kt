@@ -28,6 +28,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.GONE
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.appcompat.widget.SearchView.OnSuggestionListener
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import com.bumptech.glide.Glide
@@ -73,10 +74,14 @@ class Search : Fragment() {
             search.setQuery(adapter.getItem(i).toString(),false)
         }
 
-        val bottom = BottomSheet()
+        val bottom_view = requireActivity().findViewById<LinearLayout>(R.id.bottom_sheet)
+
+        val behavior = BottomSheetBehavior.from(bottom_view).apply {
+            peekHeight = 0
+        }
 
         controls?.setOnClickListener {
-            bottom.show(requireActivity().supportFragmentManager,"Cute")
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
         search.setOnClickListener {
