@@ -109,7 +109,7 @@ class Search : Fragment(),Listener,OnSeekBarChangeListener {
         listView.setOnItemClickListener { adapterView, view, i, l ->
             if (search.hasFocus())
             {
-                search.setQuery(adapter.getItem(i).toString(),false)
+                search.setQuery(adapter.getItem(i).toString(),true)
             }
             else
             {
@@ -153,6 +153,7 @@ class Search : Fragment(),Listener,OnSeekBarChangeListener {
         }
 
         search.setOnClickListener {
+            search.requestFocus()
             search.onActionViewExpanded()
             listView.adapter = adapter
         }
