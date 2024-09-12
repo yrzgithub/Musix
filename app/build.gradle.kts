@@ -64,6 +64,7 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.4.1")
     implementation ("com.google.android.material:material:1.6.0")
     implementation("com.github.bumptech.glide:glide:4.15.0")
+    implementation("com.google.android.exoplayer:exoplayer:2.19.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

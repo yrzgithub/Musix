@@ -15,4 +15,11 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="controls" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:background">#FFC107</item>
+        <item name="android:max">100</item>
+        <item name="android:progress">10</item>
+        <item name="android:progressDrawable">@drawable/pause</item>
+    </style>
+
 </resources>

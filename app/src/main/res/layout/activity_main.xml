@@ -35,12 +35,16 @@
 
        <TextView
            android:id="@+id/title"
-           android:layout_width="wrap_content"
+           android:layout_width="0dp"
            android:layout_height="match_parent"
            android:gravity="center"
            android:layout_weight="1"
-           android:textSize="18sp"
+           android:maxLines="1"
+           android:singleLine="true"
+           android:ellipsize="marquee"
+           android:scrollHorizontally="true"
            android:marqueeRepeatLimit="marquee_forever"
+           android:textSize="16sp"
            android:text="Song Title"/>
 
        <ImageButton

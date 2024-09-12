@@ -6,6 +6,7 @@ import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player.Listener
 import androidx.media3.exoplayer.ExoPlayer
 import java.util.logging.Handler
 import java.util.logging.LogRecord
@@ -19,6 +20,15 @@ class Player(application : Application,context : Context) : AndroidViewModel(app
         player = ExoPlayer.Builder(context).build()
     }
 
+    fun setCurrentPosition(position : Int)
+    {
+        player.seekTo(position.toLong()*1000)
+    }
+
+    fun isPlaying() : Boolean {
+        return player.isPlaying
+    }
+
     fun play(info : YTInfo) : Unit
     {
         val mediaItem : MediaItem = MediaItem.fromUri(info.stream_url!!)
@@ -28,7 +38,56 @@ class Player(application : Application,context : Context) : AndroidViewModel(app
         player.play()
     }
 
+    fun play()
+    {
+        player.play()
+    }
+
+    fun forward()
+    {
+        player.seekTo(player.currentPosition + 3000)
+    }
+
+    fun backward()
+    {
+        player.seekTo(player.currentPosition - 3000)
+    }
+
+    fun pause()
+    {
+        player.pause()
+    }
+
+    fun getDuration() : Int {
+        return player.contentDuration.div(1000).toInt()
+    }
+
+    fun getBufferedDuration() : Int {
+        return player.bufferedPosition.div(1000).toInt()
+    }
+
+    fun getCurrentPosition() : Int {
+        return player.currentPosition.div(1000).toInt()
+    }
+
+    fun getDurationString(duration : Double) : String {
+        val min = Math.round(duration/60)
+        val sec = Math.round(duration%60)
+        return String.format("%1d:%02d",min,sec)
+    }
+
+    fun getCurrentStringDuration() : String {
+        return getDurationString(getCurrentPosition().toDouble())
+    }
+
+    fun getStringDuration() : String {
+        return getDurationString(getDuration().toDouble())
+    }
+
     override fun onCleared() {
+        player.pause()
+        player.stop()
+        player.release()
         super.onCleared()
     }
 }

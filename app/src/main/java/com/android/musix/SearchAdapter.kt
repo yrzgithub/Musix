@@ -52,8 +52,16 @@ class SearchAdapter(var activity : Activity) : BaseAdapter() {
     fun getSuggestions(query : String)
     {
         CoroutineScope(Dispatchers.IO).launch {
-            val results : List<String> = main.callAttr("getSuggestions",query).asList().map { it.toString() }
-            update(results)
+            try {
+                val results : List<String> = main.callAttr("getSuggestions",query).asList().map { it.toString() }
+                update(results)
+            }
+
+            catch (e : Exception)
+            {
+                println(e.printStackTrace())
+            }
+
         }
     }
 }
