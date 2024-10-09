@@ -44,14 +44,16 @@ android {
 
 chaquopy {
     defaultConfig {
-        buildPython("\"D:\\Apps\\python38\\python.exe\"")
+        buildPython("/usr/local/bin/python3.8")
         defaultConfig {
             version = "3.8"
 
             pip {
                 install("yt-dlp")
                 install("youtube-search-python")
-                install("youtube-dl")
+                install("requests")
+                install("bs4")
+
             }
         }
     }

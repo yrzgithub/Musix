@@ -35,7 +35,8 @@ class SearchListAdapter(val context : Context, var info : List<YTInfo>) : BaseAd
 
     override fun getView(p0: Int, view_: View?, p2: ViewGroup?): View {
 
-        val view = if(view_==null) LayoutInflater.from(context).inflate(R.layout.custom_yt_search,null,false) else view_
+        val view =
+            view_ ?: LayoutInflater.from(context).inflate(R.layout.custom_yt_search,null,false) // elvis operator
 
         val thumbnail = view.findViewById<ImageView>(R.id.thumb_search)
         val title = view.findViewById<TextView>(R.id.title_search)

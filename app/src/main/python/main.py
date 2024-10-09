@@ -1,13 +1,19 @@
 from yt_dlp import *
+from bs4 import BeautifulSoup
+from requests import get
 from youtubesearchpython import *
 
 
 
 ydl_opts =  {
     'format': 'm4a/bestaudio',
+    "allsubtitles":True,
+    'writesubtitles': True,
+    'writeautomaticsub': True,
+    'subtitlesformat': 'srv1'
 }
 
-dl = YoutubeDL(ydl_opts)
+
 suggestions = Suggestions(language = "en", region = "IN", timeout = None)
 
 
@@ -36,8 +42,19 @@ def getUrlsInfo(query,limit=20,lang="en",region="IN",timeout=None):
 
 
 def getStream(url):
-    info = dl.extract_info(url,download=False)
-    return info["url"]
+    with YoutubeDL(ydl_opts) as dl:
+        info = dl.extract_info(url,download=False)
+        dl.close()
+
+    lang,data = next(filter(lambda data : "orig" in data[0],info["requested_subtitles"].items()))
+
+    soup = BeautifulSoup(get(data["url"]).text,"html.parser")
+    texts = soup.find_all("text")
+
+    lyrics = [{"start":line["start"],"dur":line["dur"],"line":line.text} for line in texts]
+
+    print(info["url"])
+    return {"stream" : info["url"],"lyrics" : lyrics}
 
 
 def getSuggestions(query):

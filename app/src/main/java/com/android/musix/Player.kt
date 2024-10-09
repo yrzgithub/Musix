@@ -2,14 +2,9 @@ package com.android.musix
 
 import android.app.Application
 import android.content.Context
-import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
-import androidx.media3.common.Player.Listener
 import androidx.media3.exoplayer.ExoPlayer
-import java.util.logging.Handler
-import java.util.logging.LogRecord
 
 class Player(application : Application,context : Context) : AndroidViewModel(application) {
 
@@ -58,7 +53,7 @@ class Player(application : Application,context : Context) : AndroidViewModel(app
         player.pause()
     }
 
-    fun getDuration() : Int {
+    fun getTotalDuration() : Int {
         return player.contentDuration.div(1000).toInt()
     }
 
@@ -80,8 +75,8 @@ class Player(application : Application,context : Context) : AndroidViewModel(app
         return getDurationString(getCurrentPosition().toDouble())
     }
 
-    fun getStringDuration() : String {
-        return getDurationString(getDuration().toDouble())
+    fun getTotalStringDuration() : String {
+        return getDurationString(getTotalDuration().toDouble())
     }
 
     override fun onCleared() {

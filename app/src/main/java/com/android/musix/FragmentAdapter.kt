@@ -18,7 +18,12 @@ class FragmentAdapter(var manager : FragmentManager,cycle : Lifecycle) : Fragmen
     }
 
     override fun createFragment(position: Int): Fragment {
-        return Search()
+        return when(position) {
+            0 -> Search()
+            1 -> Lyrics()
+            2 -> Playlist()
+            else -> Search()
+        }
     }
 
 }

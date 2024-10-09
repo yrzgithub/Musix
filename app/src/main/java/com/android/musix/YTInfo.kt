@@ -22,6 +22,10 @@ class YTInfo(val query : String) {
 
     var infoList : List<YTInfo>? = null
 
+    companion object {
+        var lyrics : List<Map<String,String?>>? = null
+    }
+
     fun fetch() : List<YTInfo>?
     {
          infoList = module.callAttr("getUrlsInfo",query).asList().map {
@@ -47,8 +51,19 @@ class YTInfo(val query : String) {
     }
 
     fun getStream(info : YTInfo) : String? {
-        println("link : "+ info.link)
-        stream_url = module.callAttr("getStream", info.link).toString()
+
+        val songData : Map<String,PyObject>  = module.callAttr("getStream", info.link).asMap().entries.associate { (key,value) -> key.toString() to value }
+5
+        stream_url = songData["stream"].toString()
+        lyrics = songData["lyrics"]?.asList()?.map {
+            it.asMap().entries.associate {
+                    (key,value) -> if(key!=null && value!=null) key.toString() to value.toString() else key.toString() to null
+            }
+        }
+
+        println("Stream URL : $stream_url")
+        println("Lyrics : $lyrics")
+
         return stream_url
     }
 }

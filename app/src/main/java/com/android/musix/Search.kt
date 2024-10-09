@@ -8,7 +8,10 @@ import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -18,10 +21,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
-import androidx.core.os.postDelayed
 import androidx.media3.common.Player.Listener
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerControlView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
-class Search : Fragment(),Listener,OnSeekBarChangeListener {
+class Search : Fragment(),Listener,OnSeekBarChangeListener,OnClickListener,OnItemClickListener,OnQueryTextListener {
 
     lateinit var listView : ListView
     lateinit var thumbnail : ImageView
@@ -50,6 +51,12 @@ class Search : Fragment(),Listener,OnSeekBarChangeListener {
     lateinit var playBtn : ImageButton
     lateinit var forwardBtn : ImageButton
     lateinit var backwardBtn : ImageButton
+    lateinit var search : SearchView
+    lateinit var controls : LinearLayout
+
+    lateinit var adapter : SearchAdapter
+
+    lateinit var behavior : BottomSheetBehavior<LinearLayout>
 
     var seekHandler : Handler = Handler(Looper.getMainLooper())
 
@@ -58,12 +65,12 @@ class Search : Fragment(),Listener,OnSeekBarChangeListener {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
 
         val layout = view.findViewById<LinearLayout>(R.id.layout)
-        val search = view.findViewById<SearchView>(R.id.search)
-        listView = view.findViewById<ListView>(R.id.searchList)
+        search = view.findViewById<SearchView>(R.id.search)
+        listView = view.findViewById<ListView>(R.id.searchList).apply { onItemClickListener = this@Search }
 
-        val controls = activity?.findViewById<LinearLayout>(R.id.controls)
+        controls = activity?.findViewById<LinearLayout>(R.id.controls)!!
         thumbnail = activity?.findViewById<ImageView>(R.id.thumbnail)!!
-        title = activity?.findViewById<TextView>(R.id.title)!!
+        title = activity?.findViewById<TextView>(R.id.title)!!.apply { isSelected = true }
         favourite = activity?.findViewById<ImageButton>(R.id.favourite)!!
         sheetEnd = activity?.findViewById<TextView>(R.id.end)!!
         sheetStart = activity?.findViewById<TextView>(R.id.start)!!
@@ -71,126 +78,30 @@ class Search : Fragment(),Listener,OnSeekBarChangeListener {
         forwardBtn = activity?.findViewById<ImageButton>(R.id.forward)!!
         backwardBtn = activity?.findViewById<ImageButton>(R.id.backward)!!
 
-        val bottom_view = requireActivity().findViewById<LinearLayout>(R.id.bottom_sheet)
-        sheetThumb = bottom_view.findViewById(R.id.thumb)
-        sheetTitle = bottom_view.findViewById(R.id.title)
-        sheetSeek = bottom_view.findViewById(R.id.seek)
-
-        title.isSelected = true
-        sheetTitle.isSelected = true
-
-        sheetSeek.setOnSeekBarChangeListener(this)
+        val bottomView = requireActivity().findViewById<LinearLayout>(R.id.bottom_sheet)
+        sheetThumb = bottomView.findViewById(R.id.thumb)
+        sheetTitle = bottomView.findViewById<TextView?>(R.id.title).apply { isSelected = true }
+        sheetSeek = bottomView.findViewById(R.id.seek)
 
         play = Player(requireActivity().application,requireContext())
         play.player.addListener(this)
 
-        playBtn.setOnClickListener {
-            if(play.isPlaying()) {
-                playBtn.setImageResource(R.drawable.play)
-                play.pause()
-            }
-            else {
-                playBtn.setImageResource(R.drawable.pause)
-                play.play()
-            }
-        }
-
-        forwardBtn.setOnClickListener {
-            play.forward()
-        }
-
-        backwardBtn.setOnClickListener {
-            play.backward()
-        }
-
-        val adapter = SearchAdapter(activity as Activity)
-        listView.adapter = adapter
-
-        listView.setOnItemClickListener { adapterView, view, i, l ->
-            if (search.hasFocus())
-            {
-                search.setQuery(adapter.getItem(i).toString(),true)
-            }
-            else
-            {
-                play.pause()
-
-                val info = (adapterView.adapter as SearchListAdapter).getItem(i) as YTInfo // infos.get(i)
-
-                info.title.also {
-                    title.text = it
-                    sheetTitle.text = it
-                }
-
-                Glide.with(requireActivity()).asDrawable().addListener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-                        return false
-                    }
-
-                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                        thumbnail.setImageDrawable(resource)
-                        sheetThumb.setImageDrawable(resource)
-                        return false
-                    }
-
-                }).load(info.thumbnail).submit()
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    info.getStream(info)
-                    requireActivity().runOnUiThread {
-                        play.play(info)
-                    }
-                }
-            }
-        }
-
-        val behavior = BottomSheetBehavior.from(bottom_view).apply {
+        behavior = BottomSheetBehavior.from(bottomView).apply {
             peekHeight = 0
         }
 
-        controls?.setOnClickListener {
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
+        adapter = SearchAdapter(activity as Activity)
+        listView.adapter = adapter
 
-        search.setOnClickListener {
-            search.requestFocus()
-            search.onActionViewExpanded()
-            listView.adapter = adapter
-        }
+        sheetSeek.setOnSeekBarChangeListener(this)
 
-        search.setOnQueryTextListener(object : OnQueryTextListener {
+        playBtn.setOnClickListener(this)
+        forwardBtn.setOnClickListener(this)
+        backwardBtn.setOnClickListener(this)
+        controls.setOnClickListener(this)
+        search.setOnClickListener(this)
 
-            override fun onQueryTextChange(p0: String?): Boolean {
-                adapter.getSuggestions(p0!!)
-                return false
-            }
-
-            override fun onQueryTextSubmit(query: String?): Boolean {
-
-                search.clearFocus()
-                search.onActionViewCollapsed()
-
-                if(query!=null && query.isEmpty()) return false
-                CoroutineScope(Dispatchers.IO).cancel()
-
-                runBlocking {
-
-                    CoroutineScope(Dispatchers.IO).launch {
-
-                        val info = YTInfo(query!!)
-                        val infos = info.fetch()
-
-                        activity!!.runOnUiThread {
-                            updateUI(infos!!)
-                        }
-
-                    }
-
-                }
-
-                return false
-            }
-        })
+        search.setOnQueryTextListener(this)
 
         return view
     }
@@ -200,10 +111,8 @@ class Search : Fragment(),Listener,OnSeekBarChangeListener {
         {
             ExoPlayer.STATE_READY -> {
 
-                sheetSeek.apply {
-                    max = play.getDuration()
-                    sheetEnd.text = play.getStringDuration()
-                }
+                sheetSeek.max = play.getTotalDuration()
+                sheetEnd.text = play.getTotalStringDuration()
 
                 seekHandler.postDelayed(object : Runnable {
                     override fun run() {
@@ -221,8 +130,15 @@ class Search : Fragment(),Listener,OnSeekBarChangeListener {
 
             ExoPlayer.STATE_ENDED -> {
                 seekHandler.removeCallbacksAndMessages(null)
+                sheetEnd.setText(play.getTotalStringDuration())
+
+            }
+
+            ExoPlayer.STATE_BUFFERING -> {
+                playBtn.setImageResource(R.drawable.loading)
             }
         }
+
         super.onPlaybackStateChanged(playbackState)
     }
 
@@ -249,5 +165,113 @@ class Search : Fragment(),Listener,OnSeekBarChangeListener {
 
     override fun onStopTrackingTouch(p0: SeekBar?) {
         play.play()
+    }
+
+    override fun onClick(p0: View?) {
+        when(p0?.id)
+        {
+            playBtn.id -> {
+                if(play.isPlaying()) {
+                    play.pause()
+                }
+                else {
+                    play.play()
+                }
+            }
+
+            forwardBtn.id -> play.forward()
+
+            backwardBtn.id -> play.backward()
+
+            controls.id -> behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+            search.id -> {
+                search.requestFocus()
+                search.onActionViewExpanded()
+                listView.adapter = adapter
+            }
+        }
+    }
+
+    override fun onItemClick(adapterView: AdapterView<*>?, p1: View?, i: Int, p3: Long) {
+        if (adapterView?.adapter?.javaClass?.equals(SearchAdapter::class.java)!!)
+        {
+            search.setQuery(adapter.getItem(i).toString(),true)
+        }
+        else
+        {
+            play.pause()
+
+            val info = (adapterView.adapter as SearchListAdapter).getItem(i) as YTInfo // infos.get(i)
+
+            info.title.also {
+                title.text = it
+                sheetTitle.text = it
+            }
+
+            Glide.with(requireActivity()).asDrawable().addListener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                    return false
+                }
+
+                override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                    thumbnail.setImageDrawable(resource)
+                    sheetThumb.setImageDrawable(resource)
+                    return false
+                }
+
+            }).load(info.thumbnail).submit()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                info.getStream(info)
+                requireActivity().runOnUiThread {
+                    play.play(info)
+                }
+            }
+        }
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        search.clearFocus()
+        search.onActionViewCollapsed()
+
+        if(query!=null && query.isEmpty()) return false
+        CoroutineScope(Dispatchers.IO).cancel()
+
+        runBlocking {
+
+            CoroutineScope(Dispatchers.IO).launch {
+
+                val info = YTInfo(query!!)
+                val infos = info.fetch()
+
+                requireActivity().runOnUiThread {
+                    updateUI(infos!!)
+                }
+
+            }
+
+        }
+
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        adapter.getSuggestions(newText!!)
+        return false
+    }
+
+    override fun onPositionDiscontinuity(oldPosition: androidx.media3.common.Player.PositionInfo, newPosition: androidx.media3.common.Player.PositionInfo, reason: Int) {
+
+        println("${oldPosition.positionMs} ${newPosition.positionMs}")
+
+        super.onPositionDiscontinuity(oldPosition, newPosition, reason)
+    }
+
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+
+        playBtn.setImageResource(if(isPlaying) R.drawable.pause else R.drawable.play)
+
+        super.onIsPlayingChanged(isPlaying)
     }
 }
